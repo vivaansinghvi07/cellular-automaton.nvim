@@ -1,7 +1,8 @@
 local M = {
-  fps = 50,
-  side_noise = true,
-  disperse_rate = 3,
+  fps = 30,
+  side_noise = false,
+  disperse_rate = 1,
+  skip_identifiers = {"punctuation"}
 }
 
 local frame
@@ -19,6 +20,15 @@ end
 
 M.init = function(grid)
   frame = 1
+end
+
+local any_strings_found = function(main_str, others)
+  for _, str in ipairs(others) do
+    if string.find(main_str or "", str) then
+      return true
+    end
+  end
+  return false
 end
 
 M.update = function(grid)
@@ -45,7 +55,7 @@ M.update = function(grid)
       local cell = grid[x0][y0]
 
       -- skip spaces and comments or already proccessed cells
-      if cell.char == " " or string.find(cell.hl_group or "", "comment") or cell.processed == true then
+      if cell.char == " " or any_strings_found(cell.hl_group, M.skip_identifiers) or cell.processed == true then
         goto continue
       end
 
